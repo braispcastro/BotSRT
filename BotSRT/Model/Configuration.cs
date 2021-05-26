@@ -12,5 +12,6 @@ namespace BotSRT.Model
         public string DiscordClientSecret { get; set; }
         public string DiscordToken { get; set; }
         public string SetupsChannelId { get; set; }
+        public string CurrentSeason { get; set; }
     }
 }

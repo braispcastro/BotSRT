@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace BotSRT.Services
 {
@@ -38,6 +37,18 @@ namespace BotSRT.Services
                 result = string.Concat(result, $"{++index}.- {directory.ToUpperInvariant()}\n");
             }
             return result;
+        }
+
+        public string CompleteSetupPath(string path)
+        {
+            path = Path.Combine(@"Setups", path);
+            var lenght = path.Split('\\').Length;
+            if (lenght < 4)
+            {
+                path = Path.Combine(path, Environment.GetEnvironmentVariable("CurrentSeason"));
+            }
+
+            return path;
         }
     }
 }

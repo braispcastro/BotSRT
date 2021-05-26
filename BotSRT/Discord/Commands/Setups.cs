@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using static DSharpPlus.Entities.DiscordEmbedBuilder;
 
 namespace BotSRT.Discord.Commands
 {
@@ -49,11 +48,11 @@ namespace BotSRT.Discord.Commands
                 Color = DiscordColor.Yellow,
                 Title = "🛠️ Setups",
                 Description = SetupsService.GetDirectoriesToShow(nextDirectories, startIndex),
-                Thumbnail = new EmbedThumbnail
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = "https://i.imgur.com/OdnZfqp.png"
                 },
-                Footer = new EmbedFooter
+                Footer = new DiscordEmbedBuilder.EmbedFooter
                 {
                     Text = $"v{Environment.GetEnvironmentVariable("Version")}"
                 },

@@ -4,5 +4,6 @@
   "DiscordClientId": "",
   "DiscordClientSecret": "",
   "DiscordToken": "",
-  "SetupsChannelId": ""
+  "SetupsChannelId": "",
+  "CurrentSeason": ""
 }

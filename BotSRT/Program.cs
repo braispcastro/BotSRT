@@ -32,6 +32,7 @@ namespace BotSRT
             Environment.SetEnvironmentVariable("DiscordPublicKey", configuration.DiscordPublicKey);
             Environment.SetEnvironmentVariable("DiscordToken", configuration.DiscordToken);
             Environment.SetEnvironmentVariable("SetupsChannelId", configuration.SetupsChannelId);
+            Environment.SetEnvironmentVariable("CurrentSeason", configuration.CurrentSeason);
         }
     }
 }
