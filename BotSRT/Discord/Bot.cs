@@ -1,8 +1,10 @@
-﻿using DSharpPlus;
+﻿using BotSRT.Services;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -24,10 +26,15 @@ namespace BotSRT.Discord
 
             var client = new DiscordClient(options);
 
+            var services = new ServiceCollection()
+                .AddSingleton<SetupsService>()
+                .BuildServiceProvider();
+
             var commands = client.UseCommandsNext(new CommandsNextConfiguration
             {
                 EnableMentionPrefix = false,
-                StringPrefixes = new[] { "!" }
+                StringPrefixes = new[] { "!" },
+                Services = services
             });
             commands.RegisterCommands(Assembly.GetExecutingAssembly());
 

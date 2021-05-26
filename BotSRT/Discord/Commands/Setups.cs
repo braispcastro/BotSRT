@@ -1,4 +1,5 @@
-﻿using DSharpPlus.CommandsNext;
+﻿using BotSRT.Services;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity.Extensions;
@@ -21,14 +22,14 @@ namespace BotSRT.Discord.Commands
             Setup
         }
 
-        private const int ITEMS_TO_SHOW = 4;
-
         private ulong currentEmbedId;
         private string currentPath;
         private List<string> nextDirectories;
 
         private int mode = 0;
         private int startIndex = 0;
+
+        public SetupsService SetupsService { private get; set; }
 
         [Command("setups")]
         public async Task SetupsCommand(CommandContext context)
@@ -39,7 +40,7 @@ namespace BotSRT.Discord.Commands
             mode = 0;
             startIndex = 0;
             currentPath = @".\Setups";
-            nextDirectories = GetNextDirectories().ToList();
+            nextDirectories = SetupsService.GetNextDirectories(currentPath).ToList();
             if (!nextDirectories.Any())
                 return;
 
@@ -47,7 +48,7 @@ namespace BotSRT.Discord.Commands
             {
                 Color = DiscordColor.Yellow,
                 Title = "🛠️ Setups",
-                Description = GetDirectoriesToShow(),
+                Description = SetupsService.GetDirectoriesToShow(nextDirectories, startIndex),
                 Thumbnail = new EmbedThumbnail
                 {
                     Url = "https://i.imgur.com/OdnZfqp.png"
@@ -60,8 +61,8 @@ namespace BotSRT.Discord.Commands
             };
 
             embedBuilder.AddField("Ruta", currentPath);
-            var totalPages = Math.Round(Convert.ToDecimal(nextDirectories.Count) / Convert.ToDecimal(ITEMS_TO_SHOW));
-            embedBuilder.AddField("Página", $"{(startIndex / ITEMS_TO_SHOW) + 1}/{(totalPages == 0 ? 1 : totalPages)}");
+            var totalPages = Math.Round(Convert.ToDecimal(nextDirectories.Count) / Convert.ToDecimal(SetupsService.ItemsToShow));
+            embedBuilder.AddField("Página", $"{(startIndex / SetupsService.ItemsToShow) + 1}/{(totalPages == 0 ? 1 : totalPages)}");
 
             var embedMessage = embedBuilder.Build();
             var message = await context.Channel.SendMessageAsync(embedMessage);
@@ -92,7 +93,7 @@ namespace BotSRT.Discord.Commands
             switch (result.Result.Emoji)
             {
                 case "⬅️":
-                    var pIdx = startIndex - ITEMS_TO_SHOW;
+                    var pIdx = startIndex - SetupsService.ItemsToShow;
                     startIndex = (pIdx < 0) ? 0 : pIdx;
                     message = await UpdateMessage(message);
                     await AwaitReaction(context, message);
@@ -110,7 +111,7 @@ namespace BotSRT.Discord.Commands
                     await GoToNextDirectory(context, message, startIndex + 3);
                     break;
                 case "➡️":
-                    var nIdx = startIndex + ITEMS_TO_SHOW;
+                    var nIdx = startIndex + SetupsService.ItemsToShow;
                     startIndex = (nIdx >= nextDirectories.Count) ? startIndex : nIdx;
                     message = await UpdateMessage(message);
                     await AwaitReaction(context, message);
@@ -121,38 +122,12 @@ namespace BotSRT.Discord.Commands
         private async Task<DiscordMessage> UpdateMessage(DiscordMessage message)
         {
             var embedBuilder = new DiscordEmbedBuilder(message.Embeds.First());
-            embedBuilder.Description = GetDirectoriesToShow();
+            embedBuilder.Description = SetupsService.GetDirectoriesToShow(nextDirectories, startIndex);
             embedBuilder.ClearFields();
             embedBuilder.AddField("Ruta", currentPath);
-            var totalPages = Math.Round(Convert.ToDecimal(nextDirectories.Count) / Convert.ToDecimal(ITEMS_TO_SHOW));
-            embedBuilder.AddField("Página", $"{(startIndex / ITEMS_TO_SHOW) + 1}/{(totalPages == 0 ? 1 : totalPages)}");
+            var totalPages = Math.Round(Convert.ToDecimal(nextDirectories.Count) / Convert.ToDecimal(SetupsService.ItemsToShow));
+            embedBuilder.AddField("Página", $"{(startIndex / SetupsService.ItemsToShow) + 1}/{(totalPages == 0 ? 1 : totalPages)}");
             var result = await message.ModifyAsync(embedBuilder.Build());
-            return result;
-        }
-
-        private IEnumerable<string> GetNextDirectories()
-        {
-            if (Directory.Exists(currentPath))
-            {
-                var directories = Directory.GetDirectories(currentPath);
-                foreach(var directory in directories)
-                {
-                    yield return Path.GetFileName(directory);
-                }
-            }
-        }
-
-        private string GetDirectoriesToShow()
-        {
-            int index = 0;
-            var result = "";
-            var parseItemsToShow = startIndex + ITEMS_TO_SHOW >= nextDirectories.Count 
-                ? nextDirectories.Count - startIndex 
-                : ITEMS_TO_SHOW;
-            foreach (var directory in nextDirectories.GetRange(startIndex, parseItemsToShow))
-            {
-                result = string.Concat(result, $"{++index}.- {directory.ToUpperInvariant()}\n");
-            }
             return result;
         }
 
@@ -168,7 +143,7 @@ namespace BotSRT.Discord.Commands
             }
             else
             {
-                nextDirectories = GetNextDirectories().ToList();
+                nextDirectories = SetupsService.GetNextDirectories(currentPath).ToList();
                 if (!nextDirectories.Any())
                     throw new DirectoryNotFoundException();
 
