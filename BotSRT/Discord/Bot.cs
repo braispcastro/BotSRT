@@ -1,11 +1,13 @@
 ﻿using BotSRT.Services;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -20,8 +22,8 @@ namespace BotSRT.Discord
                 Token = token,
                 TokenType = TokenType.Bot,
                 Intents = DiscordIntents.AllUnprivileged,
-                MinimumLogLevel = LogLevel.Debug,
-                LogTimestampFormat = "dd/MM/yyyy - hh:mm:ss"
+                MinimumLogLevel = LogLevel.Information,
+                LogTimestampFormat = "dd/MM/yyyy hh:mm:ss"
             };
 
             var client = new DiscordClient(options);
@@ -43,8 +45,16 @@ namespace BotSRT.Discord
                 PollBehaviour = PollBehaviour.KeepEmojis
             });
 
+            client.Ready += Client_Ready;
+
             await client.ConnectAsync();
             await Task.Delay(-1);
+        }
+
+        private Task Client_Ready(DiscordClient sender, ReadyEventArgs e)
+        {
+            Console.WriteLine($"[{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}] Conectado...");
+            return Task.CompletedTask;
         }
     }
 }

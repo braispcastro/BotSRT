@@ -33,6 +33,10 @@ namespace BotSRT.Discord.Commands
                     }
                 }
             }
+            else
+            {
+                await context.Message.CreateReactionAsync(DiscordEmoji.FromUnicode("❌"));
+            }
         }
     }
 }
