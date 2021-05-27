@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace BotSRT.Services
 {
@@ -13,16 +14,19 @@ namespace BotSRT.Services
             get { return ITEMS_TO_SHOW; }
         }
 
-        public IEnumerable<string> GetNextDirectories(string currentPath)
+        public List<string> GetNextDirectories(string currentPath)
         {
+            var result = new List<string>();
             if (Directory.Exists(currentPath))
             {
                 var directories = Directory.GetDirectories(currentPath);
                 foreach (var directory in directories)
                 {
-                    yield return Path.GetFileName(directory);
+                    result.Add(Path.GetFileName(directory));
                 }
             }
+
+            return result.OrderBy(x => x).ToList();
         }
 
         public string GetDirectoriesToShow(List<string> nextDirectories, int startIndex)
@@ -41,8 +45,13 @@ namespace BotSRT.Services
 
         public string CompleteSetupPath(string path)
         {
+            // Windows
+            path = path.Replace('\\', Path.DirectorySeparatorChar);
+            // Unix
+            path = path.Replace('/', Path.DirectorySeparatorChar);
+
             path = Path.Combine(@"Setups", path);
-            var lenght = path.Split('\\').Length;
+            var lenght = path.Split(Path.DirectorySeparatorChar).Length;
             if (lenght < 4)
             {
                 path = Path.Combine(path, Environment.GetEnvironmentVariable("CurrentSeason"));

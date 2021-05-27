@@ -38,8 +38,8 @@ namespace BotSRT.Discord.Commands
 
             mode = 0;
             startIndex = 0;
-            currentPath = @".\Setups";
-            nextDirectories = SetupsService.GetNextDirectories(currentPath).ToList();
+            currentPath = $".{Path.DirectorySeparatorChar}Setups";
+            nextDirectories = SetupsService.GetNextDirectories(currentPath);
             if (!nextDirectories.Any())
                 return;
 
@@ -142,7 +142,7 @@ namespace BotSRT.Discord.Commands
             }
             else
             {
-                nextDirectories = SetupsService.GetNextDirectories(currentPath).ToList();
+                nextDirectories = SetupsService.GetNextDirectories(currentPath);
                 if (!nextDirectories.Any())
                     throw new DirectoryNotFoundException();
 

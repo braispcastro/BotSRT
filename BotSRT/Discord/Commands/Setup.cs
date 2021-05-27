@@ -16,6 +16,9 @@ namespace BotSRT.Discord.Commands
         [Command("setup")]
         public async Task SetupCommand(CommandContext context, string path)
         {
+            if (context.Channel.Id.ToString() != Environment.GetEnvironmentVariable("SetupsChannelId"))
+                return;
+
             path = SetupsService.CompleteSetupPath(path);
             if (Directory.Exists(path))
             {
